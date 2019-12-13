@@ -7,6 +7,10 @@ router
     /**
      * Method for get all chat where one user
      */
+    .get('/', function(req, res) {
+
+        return res.status(200).send({message: 'radi'})
+    })
     .get('/:id', async function(req, res) {
         var _id = req.params.id;
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
