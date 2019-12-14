@@ -18,10 +18,13 @@ router
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
             host: 'https://twoway-usersservice.herokuapp.com',
-            port: 80,
             path: '/api/sync/',
             method: 'GET',
             headers: {
+              'Access-Control-Allow-Origin':'*',
+              'Access-Control-Allow-Credentials':'true',
+              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
+              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
               'Content-Type': 'application/json',
               'Content-Length': Buffer.byteLength(data),
               'authorization': token,
@@ -44,10 +47,13 @@ router
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
             host: 'https://twoway-usersservice.herokuapp.com',
-            port: 80,
             path: '/api/sync/',
             method: 'GET',
             headers: {
+              'Access-Control-Allow-Origin':'*',
+              'Access-Control-Allow-Credentials':'true',
+              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
+              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
               'Content-Type': 'application/json',
               'Content-Length': Buffer.byteLength(data),
               'authorization': token,
