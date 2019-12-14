@@ -51,7 +51,8 @@ router
         var token = req.body.token || req.query.token || req.headers['authorization'];
         console.log('2')
         var options = {
-            hostname: 'https://twoway-usersservice.herokuapp.com',
+            name: 'https://twoway-usersservice.herokuapp.com',
+            port: 47955,
             path: '/api/sync/',
             method: 'GET',
             headers: {
