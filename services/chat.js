@@ -51,7 +51,7 @@ router
         var token = req.body.token || req.query.token || req.headers['authorization'];
         console.log('2')
         var options = {
-            host: 'https://twoway-usersservice.herokuapp.com',
+            hostname: 'https://twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
             method: 'GET',
             headers: {
@@ -60,12 +60,11 @@ router
               'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
               'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
               'Content-Type': 'application/json',
-              'Content-Length': Buffer.byteLength(data),
               'authorization': token,
             }
         };
         console.log('3')
-        var httpreq = http.get(options, function (response) {
+        var httpreq = http.request(options, function (response) {
             console.log('4')
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
