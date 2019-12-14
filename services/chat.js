@@ -45,9 +45,11 @@ router
         httpreq.write(data);  
     })
     .post('/', async function(req, res) {
+        console.log('1')
         var friend = req.body;
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
+        console.log('2')
         var options = {
             host: 'https://twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
@@ -62,7 +64,9 @@ router
               'authorization': token,
             }
         };
+        console.log('3')
         var httpreq = http.request(options, function (response) {
+            console.log('4')
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
                 var lastLimit = -10;
