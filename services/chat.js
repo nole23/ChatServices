@@ -12,6 +12,7 @@ router
         return res.status(200).send({message: 'radi'})
     })
     .get('/:id', async function(req, res) {
+        console.log(req.get('origin'))
         var _id = req.params.id;
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
