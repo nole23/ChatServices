@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const http = require("http");
+var https = require('https');
 const chatImpl = require('../serviceImpl/chatImpl.js');
 
 router
@@ -50,20 +51,31 @@ router
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         console.log('2')
+        // var options = {
+        //     protocol: "https:",
+        //     hostname: "https://twoway-usersservice.herokuapp.com",
+        //     path: '/api/sync/',
+        //     method: 'GET',
+        //     headers: {
+        //       'Access-Control-Allow-Origin':'*',
+        //       'Content-Type': 'application/json',
+        //       'authorization': token,
+        //       'Content-Length': Buffer.byteLength(data)
+        //     }
+        // };
         var options = {
-            name: 'https://twoway-usersservice.herokuapp.com',
-            port: 47955,
+            host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
             method: 'GET',
             headers: {
-              'Access-Control-Allow-Origin':'*',
-              'Content-Type': 'application/json',
-              'authorization': token,
-              'Content-Length': Buffer.byteLength(data)
+                'Access-Control-Allow-Origin':'*',
+                'Content-Type': 'application/json',
+                'authorization': token,
+                'Content-Length': Buffer.byteLength(data)
             }
-        };
+          };
         console.log('3')
-        var httpreq = http.request(options, function (response) {
+        var httpreq = https.request(options, function (response) {
             console.log('4')
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
