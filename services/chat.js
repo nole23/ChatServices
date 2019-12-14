@@ -12,10 +12,11 @@ router
         return res.status(200).send({message: 'radi'})
     })
     .get('/:id', async function(req, res) {
-        console.log(req.get('origin'))
+        console.log('upao ovde 1')
         var _id = req.params.id;
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
+        console.log('upao ovde 2')
         var options = {
             host: 'https://twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
@@ -30,7 +31,9 @@ router
               'authorization': token,
             }
         };
+        console.log('upao ovde 3')
         var httpreq = await http.request(options, function (response) {
+            console.log('upao ovde 4')
             response.setEncoding('utf8');
             response.on('data', function (chunk) {
                 console.log(JSON.parse(chunk)._id);
