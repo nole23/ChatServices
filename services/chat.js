@@ -56,11 +56,7 @@ router
             method: 'GET',
             headers: {
               'Access-Control-Allow-Origin':'*',
-              'Access-Control-Allow-Credentials':'true',
-              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
-              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
               'Content-Type': 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded',
               'authorization': token,
               'Content-Length': Buffer.byteLength(data)
             }
