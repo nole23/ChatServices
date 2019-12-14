@@ -52,7 +52,7 @@ router
         console.log('2')
         var options = {
             name: 'https://twoway-usersservice.herokuapp.com',
-            port: 47955,
+            port: 80,
             path: '/api/sync/',
             method: 'GET',
             headers: {
@@ -61,7 +61,9 @@ router
               'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
               'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
               'Content-Type': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
               'authorization': token,
+              'Content-Length': Buffer.byteLength(data)
             }
         };
         console.log('3')
@@ -75,7 +77,8 @@ router
                 return res.status(200).send({message: chating})
             });
         });
-        httpreq.write(data);  
+        httpreq.write(data);
+        httpreq.end(); 
     })
     .post('/push', async function(req, res) {
         var chat = req.body['chat'];
