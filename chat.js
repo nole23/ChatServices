@@ -31,7 +31,14 @@ app.use('/api/chats', chating);
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
+io.set("origins","*");
+  io.set('transports', [
+    'websocket'
+  , 'flashsocket'
+  , 'htmlfile'
+  , 'xhr-polling'
+  , 'jsonp-polling'
+]);
 io.on('connection', function (socket) {
     console.log('connected:', socket.client.id);
     socket.on('typing', function(data) {
