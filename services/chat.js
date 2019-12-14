@@ -16,8 +16,8 @@ router
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
-            host: 'localhost',
-            port: 8080,
+            host: 'twoway-usersservice.herokuapp.com',
+            port: 80,
             path: '/api/sync/',
             method: 'GET',
             headers: {
@@ -42,8 +42,8 @@ router
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
-            host: 'localhost',
-            port: 8080,
+            host: 'twoway-usersservice.herokuapp.com',
+            port: 80,
             path: '/api/sync/',
             method: 'GET',
             headers: {
