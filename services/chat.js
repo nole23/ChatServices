@@ -52,6 +52,7 @@ router
         console.log('2')
         var options = {
             name: 'https://twoway-usersservice.herokuapp.com',
+            port: 47955,
             path: '/api/sync/',
             method: 'GET',
             headers: {
