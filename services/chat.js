@@ -65,7 +65,7 @@ router
             }
         };
         console.log('3')
-        var httpreq = http.request(options, function (response) {
+        var httpreq = http.get(options, function (response) {
             console.log('4')
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
