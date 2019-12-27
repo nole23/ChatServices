@@ -41,6 +41,10 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
+
+    socket.on('notify-show-messages', function(data) {
+        console.log(data);
+    })
 });
 
 app.set('socket-io', io);
