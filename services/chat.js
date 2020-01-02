@@ -46,23 +46,12 @@ router
         httpreq.write(data);  
     })
     .post('/', async function(req, res) {
-        console.log('1')
-        var friend = req.body;
+
+        var friend = req.body['body'];
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
-        console.log('2')
-        // var options = {
-        //     protocol: "https:",
-        //     hostname: "https://twoway-usersservice.herokuapp.com",
-        //     path: '/api/sync/',
-        //     method: 'GET',
-        //     headers: {
-        //       'Access-Control-Allow-Origin':'*',
-        //       'Content-Type': 'application/json',
-        //       'authorization': token,
-        //       'Content-Length': Buffer.byteLength(data)
-        //     }
-        // };
+        var reqLastElemtn = req.body['lastElement']
+
         var options = {
             host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
@@ -79,10 +68,10 @@ router
             console.log('4')
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                var lastLimit = -10;
+                var lastLimit = reqLastElemtn !== undefined ? -reqLastElemtn : -10;
                 var limit = 10;
                 var chating = await chatImpl.setChat(JSON.parse(chunk), friend, lastLimit, limit);
-                return res.status(200).send({message: chating})
+                return res.status(200).send({message: chating, lastLimit: lastLimit})
             });
         });
         httpreq.write(data);
