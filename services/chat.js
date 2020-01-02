@@ -68,7 +68,7 @@ router
             console.log('4')
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                var lastLimit = reqLastElemtn !== undefined ? -reqLastElemtn : -10;
+                var lastLimit = reqLastElemtn !== undefined ? reqLastElemtn : -10;
                 var limit = 10;
                 var chating = await chatImpl.setChat(JSON.parse(chunk), friend, lastLimit, limit);
                 return res.status(200).send({message: chating, lastLimit: lastLimit})
