@@ -7,16 +7,13 @@ module.exports = {
     },
     removeChatStatus: async function(me, friend) {
         // console.log(friend)
-        return Chat.findOne({listChater: {"$all": [me._id, friend.user._id]}}, { chatBox: { "$slice": [ -10, 10 ] }})
+        return Chat.findOne({listChater: {"$all": [me._id, friend]}}, { chatBox: { "$slice": [ -10, 10 ] }})
         .limit(10)
-        .populate('chatBox.text')
         .exec()
         .then((chatList) => {
-            // console.log(chatList)
-            // chatList.chatBox.forEach(text => {
-            //     text.text.listViewUser.push(me._id);
-            // })
-            // chatList.save();
+            chatList.chatBox.forEach(text => {
+                editStatusMessage(text.text, me);
+            })
             return 'save'
         })
         .catch((err) => {
@@ -32,7 +29,9 @@ module.exports = {
             let counter = 0;
             chatList.chatBox.forEach(text => {
                 if (text.text.listViewUser.length === 0) {
-                    counter += 1;
+                    if (text.text._id_sender.toString() != me._id.toString()) {
+                        counter += 1;
+                    }
                 }
             })
             return {user: friend, numberMessage: counter}
@@ -171,4 +170,19 @@ saveMessage = async function(item) {
     var message = new Message(item);
     console.log('dosao')
     return 
+}
+
+editStatusMessage = function(id, me) {
+    console.log(id)
+    Message.findOne({_id: id})
+    .exec()
+    .then((item) => {
+        if(item._id_sender.toString() != me._id.toString()) {
+            item.listViewUser.push(me._id)
+            item.save();
+        }
+    })
+    .catch((err) => {
+        return false;
+    })
 }

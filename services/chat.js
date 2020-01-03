@@ -65,7 +65,6 @@ router
         var httpreq = https.request(options, function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                console.log(friend)
                 var status = await chatImpl.removeChatStatus(JSON.parse(chunk), friend);
                 return res.status(200).send({message: status})
             });
