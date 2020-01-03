@@ -101,7 +101,7 @@ router
                     var status = await chatImpl.getChatStatus(JSON.parse(chunk), friends[i]);
                     resStatus.push(status);
                 }
-                return res.status(200).send({message: status})
+                return res.status(200).send({message: resStatus})
             });
         });
         httpreq.write(data);
