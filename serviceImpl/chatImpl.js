@@ -6,15 +6,17 @@ module.exports = {
         return null;
     },
     removeChatStatus: async function(me, friend) {
+        // console.log(friend)
         return Chat.findOne({listChater: {"$all": [me._id, friend.user._id]}}, { chatBox: { "$slice": [ -10, 10 ] }})
         .limit(10)
         .populate('chatBox.text')
         .exec()
         .then((chatList) => {
-            chatList.chatBox.forEach(text => {
-                text.text.listViewUser.push(me._id);
-            })
-            chatList.save();
+            // console.log(chatList)
+            // chatList.chatBox.forEach(text => {
+            //     text.text.listViewUser.push(me._id);
+            // })
+            // chatList.save();
             return 'save'
         })
         .catch((err) => {
