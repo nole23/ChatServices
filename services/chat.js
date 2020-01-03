@@ -77,6 +77,33 @@ router
         httpreq.write(data);
         httpreq.end(); 
     })
+    .post('/remove-status', async function(req, res) {
+        var friend = req.body;
+        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
+        var token = req.body.token || req.query.token || req.headers['authorization'];
+
+        var options = {
+            host: 'twoway-usersservice.herokuapp.com',
+            path: '/api/sync/',
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin':'*',
+                'Content-Type': 'application/json',
+                'authorization': token,
+                'Content-Length': Buffer.byteLength(data)
+            }
+          };
+        var httpreq = https.request(options, function (response) {
+            response.setEncoding('utf8');
+            response.on('data', async function (chunk) {
+
+                var status = await chatImpl.removeChatStatus(JSON.parse(chunk), friend);
+                return res.status(200).send({message: status})
+            });
+        });
+        httpreq.write(data);
+        httpreq.end();
+    })
     .post('/get-status', async function(req, res) {
         var friends = req.body;
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
