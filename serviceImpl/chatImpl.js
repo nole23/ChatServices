@@ -5,6 +5,24 @@ module.exports = {
     getChater: async function(_id_me, _id_friend) {
         return null;
     },
+    getChatStatus: async function(me, friend) {
+        return Chat.findOne({listChater: {"$all": [me._id, friend.user._id]}}, { chatBox: { "$slice": [ -10, 10 ] }})
+        .limit(10)
+        .populate('chatBox.text')
+        .exec()
+        .then((chatList) => {
+            let counter = 0;
+            chatList.chatBox.forEach(text => {
+                if (text.text.listViewUser.length === 0) {
+                    counter += 1;
+                }
+            })
+            return {user: friend, numberMessage: counter}
+        })
+        .catch((err) => {
+            return {user: friend, numberMessage: 0}
+        })
+    },
     setChat: async function(me, friend, lastLimit, limit) {
         return Chat.findOne({listChater: {"$all": [me._id, friend.user._id]}}, { chatBox: { "$slice": [ lastLimit, limit ] }})
         .limit(10)
