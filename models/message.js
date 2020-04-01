@@ -2,7 +2,11 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var MessageSchema = new Schema({
-    _id_sender: {
+    id_chat: {
+        type: Schema.Types.ObjectId,
+        ref: 'Chat'
+    },
+    author: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
@@ -11,6 +15,10 @@ var MessageSchema = new Schema({
     },
     media: {
         type: String
+    },
+    date: {
+        type : Date,
+        default: new Date()
     },
     listViewUser: [{
         type: Schema.Types.ObjectId,

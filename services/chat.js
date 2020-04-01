@@ -8,18 +8,44 @@ router
     /**
      * Method for get all chat where one user
      */
-    .get('/', function(req, res) {
+    .get('/', async function(req, res) {
+        var data = JSON.stringify({})
+        var token = req.body.token || req.query.token || req.headers['authorization'];
+        var options = {
+            host: 'localhost',
+            port: 8080,
+            path: '/api/chats/',
+            method: 'GET',
+            headers: {
+              'Access-Control-Allow-Origin':'*',
+              'Access-Control-Allow-Credentials':'true',
+              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
+              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(data),
+              'authorization': token,
+            }
+        };
 
-        return res.status(200).send({message: 'radi'})
+        var httpreq = http.request(options, async function (response) {
+            response.setEncoding('utf8');
+            response.on('data', async function (chunk) {
+                var message = JSON.parse(chunk)['message'];
+
+                var resData = await chatImpl.getLastMessage(message);
+                return res.status(resData.status).send({message: resData.message})
+            });
+        });
+        httpreq.write(data);
+        httpreq.end();
     })
     .get('/:id', async function(req, res) {
-        console.log('upao ovde 1')
         var _id = req.params.id;
-        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
+
+        var data = JSON.stringify({})
         var token = req.body.token || req.query.token || req.headers['authorization'];
-        console.log('upao ovde 2')
         var options = {
-            host: 'https://twoway-usersservice.herokuapp.com',
+            host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
             method: 'GET',
             headers: {
@@ -32,122 +58,48 @@ router
               'authorization': token,
             }
         };
-        console.log('upao ovde 3')
-        var httpreq = await http.request(options, function (response) {
-            console.log('upao ovde 4')
-            response.setEncoding('utf8');
-            response.on('data', function (chunk) {
-                console.log(JSON.parse(chunk)._id);
-                console.log(_id)
-                // var chating = await chatImpl.getChater(JSON.parse(chunk)._id, _id);
-                return res.status(200).send({message: 'chating'})
-            });
-        });
-        httpreq.write(data);  
-    })
-    .get('/remove-status/:id', async function(req, res) {
-        console.log('remove-status')
-        var friend = req.params.id;
-        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
-        var token = req.body.token || req.query.token || req.headers['authorization'];
 
-        var options = {
-            host: 'twoway-usersservice.herokuapp.com',
-            path: '/api/sync/',
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin':'*',
-                'Content-Type': 'application/json',
-                'authorization': token,
-                'Content-Length': Buffer.byteLength(data)
-            }
-          };
-        var httpreq = https.request(options, function (response) {
+        var httpreq = http.request(options, async function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                var status = await chatImpl.removeChatStatus(JSON.parse(chunk), friend);
-                return res.status(200).send({message: status})
+                var me = JSON.parse(chunk);
+
+                var data = await chatImpl.getAllChating(_id, 20, 0);
+                return res.status(data.status).send({message: data.message})
             });
         });
         httpreq.write(data);
         httpreq.end();
     })
-    .post('/', async function(req, res) {
-
-        var friend = req.body['body'];
-        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
+    .put('/', async function(req, res) {
+        var item = req.body;
+        var data = JSON.stringify({})
         var token = req.body.token || req.query.token || req.headers['authorization'];
-        var reqLastElemtn = req.body['lastElement']
-
         var options = {
             host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
             method: 'GET',
             headers: {
-                'Access-Control-Allow-Origin':'*',
-                'Content-Type': 'application/json',
-                'authorization': token,
-                'Content-Length': Buffer.byteLength(data)
+              'Access-Control-Allow-Origin':'*',
+              'Access-Control-Allow-Credentials':'true',
+              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
+              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(data),
+              'authorization': token,
             }
-          };
-        console.log('3')
-        var httpreq = https.request(options, function (response) {
-            console.log('4')
-            response.setEncoding('utf8');
-            response.on('data', async function (chunk) {
-                var lastLimit = reqLastElemtn !== undefined ? reqLastElemtn : -10;
-                var limit = 10;
-                var chating = await chatImpl.setChat(JSON.parse(chunk), friend, lastLimit, limit);
-                return res.status(200).send({message: chating, lastLimit: lastLimit})
-            });
-        });
-        httpreq.write(data);
-        httpreq.end(); 
-    })
-    .post('/get-status', async function(req, res) {
-        var friends = req.body;
-        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
-        var token = req.body.token || req.query.token || req.headers['authorization'];
+        };
 
-        var options = {
-            host: 'twoway-usersservice.herokuapp.com',
-            path: '/api/sync/',
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin':'*',
-                'Content-Type': 'application/json',
-                'authorization': token,
-                'Content-Length': Buffer.byteLength(data)
-            }
-          };
-        var httpreq = https.request(options, function (response) {
+        var httpreq = http.request(options, async function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                let resStatus = [];
-                for(let i=0; i<friends.length; i++) {
-                    var status = await chatImpl.getChatStatus(JSON.parse(chunk), friends[i]);
-                    resStatus.push(status);
-                }
-                return res.status(200).send({message: resStatus})
+                var me = JSON.parse(chunk);
+
+                var data = await chatImpl.setPushShow(me, item);
+                return res.status(data.status).send({message: data.message})
             });
         });
         httpreq.write(data);
-        httpreq.end(); 
-    })
-    .post('/push', async function(req, res) {
-        var chat = req.body['chat'];
-        var io = req.app.get('socket-io')
-        // console.log(chat)
-        var message = req.body['message'];
-        var push = await chatImpl.pushChat(chat, message);
-        push.query.forEach(element => {
-            if (element.toString() !== message.user._id.toString()) {
-                console.log(element)
-                io.emit("chat-" + element, {chatBoxResponse: push.chatBoxResponse, chat: push.chat, message: true});
-                return;
-            }
-        });
-        
-        return res.status(push.status).send({chatBoxResponse: push.chatBoxResponse, chat: push.chat, message: true})
+        httpreq.end();
     })
 module.exports = router;
