@@ -35,8 +35,7 @@ io.origins("*:*");
 io.on('connection', function (socket) {
     console.log('connected:', socket.client.id);
     socket.on('typing', function(data) {
-        console.log('user typing')
-        io.emit('typing-' + data.id, true)
+        io.emit('typing-' + data.chater, data.user)
     })
     socket.on('disconnect', function(){
         console.log('user disconnected');

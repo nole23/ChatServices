@@ -13,7 +13,8 @@ module.exports = {
                 _id: message[i]._id,
                 dateOfCreate: data.message.date == undefined ? new Date(message[i].dateOfCreate) : new Date(data.message.date),
                 participants: message[i].participants,
-                message: []
+                message: [],
+                status: false
             }
             
             resData.message = data.message;
