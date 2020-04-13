@@ -42,6 +42,7 @@ router
     .get('/:id', async function(req, res) {
         var _id = req.params.id;
         var body = JSON.parse(req.query.item);
+        var page = JSON.parse(req.query.page);
 
         var data = JSON.stringify({})
         var token = req.body.token || req.query.token || req.headers['authorization'];
@@ -66,12 +67,12 @@ router
             response.on('data', async function (chunk) {
                 var me = JSON.parse(chunk);
                 if (me !== null || me !== undefined) {
-                    var data = await chatImpl.getAllChating(_id, 20, 0);
+                    var data = await chatImpl.getAllChating(_id, 20, page);
                     if (data.message == 'ERROR_SERVER_NOT_FOUND') {
                         return res.status(data.status).send({message: data.message})
                     } else {
                         var editMessage = await chatImpl.editMessage(data.message, me, body);
-                        return res.status(200).send({message: editMessage.message})
+                        return res.status(200).send({message: editMessage.message, page: page})
                     }
                 } else {
                     return res.status(200).send({message: 'ERROR_SERVER_NOT_FOUND'})

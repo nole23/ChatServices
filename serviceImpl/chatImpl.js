@@ -66,7 +66,7 @@ module.exports = {
                 return {status: 200, message: 'ERROR_SERVER_NOT_FOUND'};
             })
     },
-    getAllChating: async function(_id, limit, page) {
+    getAllChating: async function(_id, limit, page = 0) {
         return Message.find({id_chat: _id})
             .sort({date: -1})
             .limit(limit)
