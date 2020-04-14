@@ -33,7 +33,7 @@ app.use('/api/chats', chating);
 var http = require('http').Server(app);
 
 
-var allowedOrigins = "http://localhost:* http://127.0.0.1:* https://twoway1.herokuapp.com";
+var allowedOrigins = "http://localhost:4200 http://127.0.0.1:4200 https://twoway1.herokuapp.com";
 var ios = io(http, {
     origins: allowedOrigins
 });
