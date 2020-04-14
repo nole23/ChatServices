@@ -4,6 +4,7 @@ const favicon = require('serve-favicon');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const mongoSanitize = require('express-mongo-sanitize');
+var io = require('socket.io');
 
 var mongodbUri = "mongodb://nole23:novica23@ds131384.mlab.com:31384/twoway_chat"
 mongoose.connect(mongodbUri, {useNewUrlParser: true});
@@ -30,9 +31,14 @@ app.use(function (req, res, next) {
 app.use('/api/chats', chating);
 
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
 
-io.on('connection', function (socket) {
+
+var allowedOrigins = "http://localhost:* http://127.0.0.1:* https://twoway1.herokuapp.com";
+var ios = io(http, {
+    origins: allowedOrigins
+});
+
+ios.on('connection', function (socket) {
     console.log('connected:', socket.client.id);
     socket.on('typing', function(data) {
         io.emit('typing-' + data.chater, data.user)
@@ -46,5 +52,5 @@ io.on('connection', function (socket) {
     })
 });
 
-app.set('socket-io', io);
+app.set('socket-io', ios);
 http.listen(port, () => console.log(`UserServer is start on port: ${ port }`))
