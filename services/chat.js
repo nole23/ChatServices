@@ -12,8 +12,7 @@ router
         var data = JSON.stringify({})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
-            host: 'localhost',
-            port: 8080,
+            host: 'twoway-usersservice.herokuapp.com',
             path: '/api/chats/',
             method: 'GET',
             headers: {
@@ -47,8 +46,7 @@ router
         var data = JSON.stringify({})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
-            host: 'localhost',
-            port: 8080,
+            host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
             method: 'GET',
             headers: {
