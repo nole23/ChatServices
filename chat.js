@@ -41,7 +41,7 @@ var ios = io(http, {
 ios.on('connection', function (socket) {
     console.log('connected:', socket.client.id);
     socket.on('typing', function(data) {
-        io.emit('typing-' + data.chater, data.user)
+        ios.emit('typing-' + data.chater, data.user)
     })
     socket.on('disconnect', function(){
         console.log('user disconnected');
