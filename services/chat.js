@@ -6,7 +6,7 @@ const chatImpl = require('../serviceImpl/chatImpl.js');
 
 router
     /**
-     * Method for get all chat where one user
+     * Vracamo sve osobe sa kojima smo pisali a nisu izbrisani
      */
     .get('/', async function(req, res) {
         var data = JSON.stringify({})
@@ -26,13 +26,17 @@ router
             }
         };
 
-        var httpreq = http.request(options, async function (response) {
+        var httpreq = https.request(options, async function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                var message = JSON.parse(chunk)['message'];
+                var message = JSON.parse(chunk);
 
-                var resData = await chatImpl.getLastMessage(message);
-                return res.status(resData.status).send({message: resData.message})
+                var resData = await chatImpl.getLastMessage(message['message']);
+                return res.status(resData.status)
+                    .send({
+                        message: resData.message,
+                        socket: 'SOCKET_NULL_POINT'
+                    })
             });
         });
         httpreq.write(data);
@@ -67,23 +71,42 @@ router
                 if (me !== null || me !== undefined) {
                     var data = await chatImpl.getAllChating(_id, 20, page);
                     if (data.message == 'ERROR_SERVER_NOT_FOUND') {
-                        return res.status(data.status).send({message: data.message})
+                        return res.status(data.status)
+                            .send({
+                                message: data.message,
+                                socket: 'SOCKET_NULL_POINT'
+                            })
                     } else {
                         var editMessage = await chatImpl.editMessage(data.message, me, body);
-                        return res.status(200).send({message: editMessage.message, page: page})
+                        return res.status(200)
+                            .send({
+                                message: editMessage.message,
+                                page: page,
+                                socket: 'SOCKET_NULL_POINT'
+                            })
                     }
                 } else {
-                    return res.status(200).send({message: 'ERROR_SERVER_NOT_FOUND'})
+                    return res.status(200)
+                        .send({
+                            message: 'ERROR_SERVER_NOT_FOUND',
+                            socket: 'SOCKET_NULL_POINT'
+                        })
                 }
             });
         });
         httpreq.write(data);
         httpreq.end();
     })
+    /**
+     * Prilikom slanja poruke, dobijemo informaciju koji chat par komunicira
+     * sacuvamo poruku sa svim parametrima i vratimo informaciju posiljao da je
+     * porukua sacuvana, ali vratimo i ostalim ucesnicima chata da je poruka
+     * poslata tako sto iz liste primalaca posaljemo poruku kroz socket
+     */
     .post('/', async function(req, res) {
         var chat = req.body.chat;
         var message = req.body.message;
-
+        
         var data = JSON.stringify({})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var options = {
@@ -106,8 +129,17 @@ router
             response.on('data', async function (chunk) {
                 var me = JSON.parse(chunk);
 
-                var resData = await chatImpl.pushMessage(me, chat, message, req);
-                return res.status(resData.status).send({message: resData.message});
+                var resData = await chatImpl.pushMessage(me, chat, message);
+                return res.status(resData.status)
+                    .json({
+                        message: resData.message, 
+                        socket: {
+                            type: 'CHAT',
+                            link: 'new-message-',
+                            participants: resData.participants,
+                            data: resData.data
+                        }
+                    });
             });
         });
         httpreq.write(data);
@@ -149,7 +181,12 @@ router
                     data = await chatImpl.setRemoveShow(me, item);
                 }
                 
-                return res.status(data.status).send({message: data.message})
+                // Ovde postoji socket treba ga srediti
+                return res.status(data.status)
+                    .json({
+                        message: data.message, 
+                        socket: 'SOCKET_NULL_POINT'
+                    })
             });
         });
         httpreq.write(data);
@@ -185,7 +222,11 @@ router
                 var me = JSON.parse(chunk);
 
                 var data = await chatImpl.setPushShow(me, item, isType);
-                return res.status(data.status).send({message: data.message})
+                return res.status(data.status)
+                    .json({
+                        message: data.message,
+                        socket: 'SOCKET_NULL_POINT'
+                    })
             });
         });
         httpreq.write(data);
@@ -220,7 +261,11 @@ router
                 var me = JSON.parse(chunk);
 
                 var resData = await chatImpl.removeOneMessage(me, id);
-                return res.status(resData.status).send({message: resData.message})
+                return res.status(resData.status)
+                    .send({
+                        message: resData.message,
+                        socket: 'SOCKET_NULL_POINT'
+                    })
             });
         });
         httpreq.write(data);

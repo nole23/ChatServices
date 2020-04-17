@@ -1,5 +1,4 @@
 const { ObjectId } = require('mongodb');
-const Chat = require('../models/chat.js');
 const Message = require('../models/message.js');
 const chatFunction = require('../functions/chatFunction.js');
 
@@ -83,7 +82,7 @@ module.exports = {
                 return {status: 200, message: 'ERROR_SERVER_NOT_FOUND'};
             })
     },
-    pushMessage: async function(me, chat, message, req) {
+    pushMessage: async function(me, chat, message) {
         var newMessage = new Message();
         newMessage.id_chat = chat._id;
         newMessage.author = me._id;
@@ -92,13 +91,14 @@ module.exports = {
         newMessage.listViewUser.push(me._id)
 
         newMessage.save();
-        var io = req.app.get('socket-io')
-        chat.participants.forEach(element => {
-            io.emit('new-message-' + element._id, 
-                JSON.stringify({chat: chat, message: newMessage})
-            )
-        })
-        return {status: 200, message: 'SUCCESS_SAVE', data: newMessage}
+        return {
+            status: 200, message: 'SUCCESS_SAVE',
+            participants: chat.participants,
+            data: {
+                chat: chat,
+                message: newMessage
+            }
+        }
     },
     editMessage: async function(message, me, item) {
         var listUser = item.participants;
