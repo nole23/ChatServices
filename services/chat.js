@@ -180,12 +180,11 @@ router
                 } else {
                     data = await chatImpl.setRemoveShow(me, item);
                 }
-                
-                // Ovde postoji socket treba ga srediti
+
                 return res.status(data.status)
-                    .json({
+                    .send({
                         message: data.message, 
-                        socket: 'SOCKET_NULL_POINT'
+                        socket: data.socket
                     })
             });
         });

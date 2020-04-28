@@ -33,19 +33,34 @@ module.exports = {
         return Message.find({id_chat: item._id})
             .exec()
             .then(message => {
+                var participants = []
                 message.forEach(element => {
                     if (element.listViewUser !== undefined) {
                         const index = element.listViewUser.indexOf(me._id);
                         if (index == -1 ) {
                             element.listViewUser.push(_id)
+                            element.listViewUser.forEach(el => {
+                                participants.push({_id: el})
+                            })
                         }
                     }
                     element.save();
                 });
-                return {status: 200, message: 'SUCCESS_SAVE_ADD'};
+
+                
+                return {
+                    status: 200, 
+                    message: 'SUCCESS_SAVE_ADD', 
+                    socket: {
+                        type: 'CHAT',
+                        link: 'show-message-',
+                        participants: participants,
+                        data: me
+                    }
+                };
             })
             .catch(err => {
-                return {status: 200, message: 'ERROR_SERVER_NOT_FOUND'};
+                return {status: 200, message: 'ERROR_SERVER_NOT_FOUND', socket: 'SOCKET_NULL_POINT'};
             })
     },
     setRemoveShow: async function(me, item) {
@@ -59,10 +74,10 @@ module.exports = {
                         message.save();
                     }
                 }
-                return {status: 200, message: 'SUCCESS_SAVE_REMOVE'};
+                return {status: 200, message: 'SUCCESS_SAVE_REMOVE', socket: 'SOCKET_NULL_POINT'};
             })
             .catch(err => {
-                return {status: 200, message: 'ERROR_SERVER_NOT_FOUND'};
+                return {status: 200, message: 'ERROR_SERVER_NOT_FOUND', socket: 'SOCKET_NULL_POINT'};
             })
     },
     getAllChating: async function(_id, limit, page = 0) {
@@ -128,6 +143,7 @@ module.exports = {
                 var regExpSmile = chatFunction.checkSmile(oneMessage.text.toString());
                 var regExpYt = chatFunction.checkYt(oneMessage.text.toString());
                 var regExpImg = chatFunction.checkImg(oneMessage.text.toString());
+                var regExpSpecialSmile = chatFunction.checkSpecialSmile(oneMessage.text.toString()); 
 
                 if (regExpLink) {
                     if (regExpYt) {
@@ -174,6 +190,14 @@ module.exports = {
                     }
                     linkText = null;
                     text = oneMessage.text;
+                } else if (regExpSpecialSmile) {
+                    if (regExpSpecialSmile['index'] === 0) {
+                        isBgs = false;
+                    } else {
+                        isBgs = true;
+                    }
+                    linkText = null;
+                    text = oneMessage.text;
                 } else {
                     linkText = null;
                     text = oneMessage.text;
@@ -184,6 +208,7 @@ module.exports = {
                     _id: oneMessage._id,
                     text: text,
                     dateOfCreate: oneMessage.date,
+                    listViewUser: oneMessage.listViewUser,
                     isBgs: isBgs,
                     isBottom: isBottom
                 };                    
@@ -207,7 +232,9 @@ module.exports = {
                     retMessage.push(object);
                 } else {
                     if (lastStyle) {
-                        retMessage[retMessage.length - 1].message[retMessage[retMessage.length - 1].message.length - 1].isBottom = true;
+                        if (retMessage[retMessage.length - 1].isMe == object.isMe) {
+                            retMessage[retMessage.length - 1].message[retMessage[retMessage.length - 1].message.length - 1].isBottom = true;
+                        }
                     }
 
                     if (retMessage[retMessage.length - 1].user._id.toString() ==  author._id.toString()) {

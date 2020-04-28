@@ -24,6 +24,10 @@ module.exports = {
         var smileRegExp = new RegExp(/(\:\w+\:|\<[\/\\]?3|[\(\)\\\D|\*\$][\-\^]?[\:\;\=]|[\:\;\=B8][\-\^]?[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)/)
         return text.match(smileRegExp)
     },
+    checkSpecialSmile: function(text) {
+        var smileRegExp = new RegExp (/\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]/)
+        return text.match(smileRegExp);
+    },
     checkImg: function(text) {
         var imgRegExp = new RegExp(/https?:\/\/.*\.(?:png|jpg|gif|jpeg)/)
         return text.match(imgRegExp)
