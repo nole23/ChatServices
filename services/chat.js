@@ -131,7 +131,7 @@ router
 
                 var resData = await chatImpl.pushMessage(me, chat, message);
                 return res.status(resData.status)
-                    .json({
+                    .send({
                         message: resData.message, 
                         socket: {
                             type: 'CHAT',

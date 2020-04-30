@@ -107,7 +107,7 @@ module.exports = {
 
         newMessage.save();
         return {
-            status: 200, message: 'SUCCESS_SAVE',
+            status: 200, message: newMessage,
             participants: chat.participants,
             data: {
                 chat: chat,
