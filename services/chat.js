@@ -6,7 +6,7 @@ const chatImpl = require('../serviceImpl/chatImpl.js');
 
 router
     /**
-     * Vracamo sve osobe sa kojima smo pisali a nisu izbrisani
+     * Get all chater
      */
     .get('/', async function(req, res) {
         var data = JSON.stringify({})
@@ -26,22 +26,25 @@ router
             }
         };
 
-        var httpreq = https.request(options, async function (response) {
+        var httpreq = http.request(options, async function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
                 var message = JSON.parse(chunk);
 
-                var resData = await chatImpl.getLastMessage(message['message']);
+                var resData = await chatImpl.getLastMessage(message['message'], message['me']);
                 return res.status(resData.status)
                     .send({
                         message: resData.message,
-                        socket: 'SOCKET_NULL_POINT'
+                        socket: resData.socket
                     })
             });
         });
         httpreq.write(data);
         httpreq.end();
     })
+    /**
+     * Get one chater
+     */
     .get('/:id', async function(req, res) {
         var _id = req.params.id;
         var body = JSON.parse(req.query.item);
@@ -98,10 +101,7 @@ router
         httpreq.end();
     })
     /**
-     * Prilikom slanja poruke, dobijemo informaciju koji chat par komunicira
-     * sacuvamo poruku sa svim parametrima i vratimo informaciju posiljao da je
-     * porukua sacuvana, ali vratimo i ostalim ucesnicima chata da je poruka
-     * poslata tako sto iz liste primalaca posaljemo poruku kroz socket
+     * Send message
      */
     .post('/', async function(req, res) {
         var chat = req.body.chat;
@@ -146,7 +146,7 @@ router
         httpreq.end();
     })
     /**
-     * Kada smo vidjeli poruku pa da je setujemo da je vidjena
+     * Set show new message
      */
     .put('/', async function(req, res) {
         var item = req.body['chat'];
@@ -192,47 +192,16 @@ router
         httpreq.end();
     })
     /**
-     * Obrisati u user service
+     * Function not implement
      */
     .delete('/', async function(req, res) {
         var item = req.body['chat'];
         var isType = req.body['isType'];
 
-        var data = JSON.stringify({})
-        var token = req.body.token || req.query.token || req.headers['authorization'];
-        var options = {
-            host: 'twoway-usersservice.herokuapp.com',
-            path: '/api/sync/',
-            method: 'GET',
-            headers: {
-              'Access-Control-Allow-Origin':'*',
-              'Access-Control-Allow-Credentials':'true',
-              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
-              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
-              'Content-Type': 'application/json',
-              'Content-Length': Buffer.byteLength(data),
-              'authorization': token,
-            }
-        };
-
-        var httpreq = http.request(options, async function (response) {
-            response.setEncoding('utf8');
-            response.on('data', async function (chunk) {
-                var me = JSON.parse(chunk);
-
-                var data = await chatImpl.setPushShow(me, item, isType);
-                return res.status(data.status)
-                    .json({
-                        message: data.message,
-                        socket: 'SOCKET_NULL_POINT'
-                    })
-            });
-        });
-        httpreq.write(data);
-        httpreq.end();
+        // TO DO Create remove all chater, save remove message in new db
     })
     /**
-     * Obrisati jednu poruku koju smo poslali po id poruke
+     * Remove one message
      */
     .delete('/:id', async function(req, res) {
         var id = req.params.id;

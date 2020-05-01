@@ -1,11 +1,12 @@
 const { ObjectId } = require('mongodb');
+const http = require("http");
 const Message = require('../models/message.js');
 const chatFunction = require('../functions/chatFunction.js');
 
 module.exports = {
-    getLastMessage: async function(message) {
+    getLastMessage: async function(message, me) {
         var responData = [];
-        var lastData = ''
+        
         for (var i = 0; i < message.length; i++) {
             var data = await chatFunction.getLastMessage(message[i]._id);
             var resData = {
@@ -15,7 +16,7 @@ module.exports = {
                 message: [],
                 status: false
             }
-            
+
             resData.message = data.message;
             responData.push(resData);
         }
@@ -26,7 +27,38 @@ module.exports = {
             return a>b ? -1 : a<b ? 1 : 0;
         });
 
-        return {status: 200, message: responData};
+        return {status: 200, message: responData, socket: 'SOCKET_NULL_POINT'};
+    },
+    getOnlineUser: async function(listChater, me) {
+        var statusData = JSON.stringify({})
+        
+        var test = require('querystring').stringify({item: JSON.stringify(listChater), me: JSON.stringify(me)})
+        var options = {
+            host: 'twoway-statusservice.herokuapp.com',
+            path: '/api/status/?' + test,
+            method: 'GET',
+            headers: {
+              'Access-Control-Allow-Origin':'*',
+              'Access-Control-Allow-Credentials':'true',
+              'Access-Control-Allow-Methods':'GET, HEAD, POST, PUT, DELETE',
+              'Access-Control-Allow-Headers':'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(statusData),
+              'authorization': 'token',
+            }
+        };
+
+        var httpreq = http.request(options, async function (response) {
+            response.setEncoding('utf8');
+            response.on('data', async function (chunk) {
+                var onlineList = JSON.parse(chunk);
+
+                return {status: 200, message: onlineList}
+                
+            });
+        });
+        httpreq.write(statusData);
+        httpreq.end();
     },
     setPushShow: async function(me, item) {
         const _id = ObjectId(me._id.toString());
@@ -107,7 +139,8 @@ module.exports = {
 
         newMessage.save();
         return {
-            status: 200, message: newMessage,
+            status: 200,
+            message: newMessage,
             participants: chat.participants,
             data: {
                 chat: chat,
@@ -258,12 +291,16 @@ module.exports = {
         return Message.findById(id)
             .exec()
             .then(message => {
-
-                message.remove();
-                return {status: 200, message: 'SUCCESS_SAVE_REMOVE'}
+                if (message.author.toString() === me.toString()) {
+                    message.remove();
+                    return {status: 200, message: 'SUCCESS_SAVE_REMOVE', socket: 'SOCKET_NULL_POINT'}
+                } else {
+                    return {status: 200, message: 'ERROR_UNAUTHORIZED', socket: 'SOCKET_NULL_POINT'}
+                }
+                
             })
             .catch(err => {
-                return {status: 200, message: 'ERROR_SERVER_NOT_FOUND'}
+                return {status: 200, message: 'ERROR_SERVER_NOT_FOUND', socket: 'SOCKET_NULL_POINT'}
             })
     }
 }
