@@ -26,7 +26,7 @@ router
             }
         };
 
-        var httpreq = http.request(options, async function (response) {
+        var httpreq = https.request(options, async function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
                 var message = JSON.parse(chunk);
